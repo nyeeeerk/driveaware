@@ -1,0 +1,100 @@
+﻿git : remote: error: GH013: 
+Repository rule violations 
+found for 
+refs/heads/tflitemodel.       
+ 
+At line:1 char:1
++ git push -u origin 
+tflitemodel > push_out.txt 
+2>&1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : 
+    NotSpecified: (remote: e  
+  rror: ...emodel.        :   
+ String) [], RemoteExcepti    
+on
+    + FullyQualifiedErrorId : 
+    NativeCommandError
+ 
+remote: 
+remote: - GITHUB PUSH 
+PROTECTION        
+remote:   ΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇ
+öΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇ
+öΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇ
+öΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇ
+öΓÇöΓÇöΓÇöΓÇö        
+remote:     Resolve the 
+following violations before 
+pushing again        
+remote: 
+remote:     - Push cannot 
+contain secrets        
+remote: 
+remote:             
+remote:      (?) Learn how to 
+resolve a blocked push        
+remote:      https://docs.gith
+ub.com/code-security/secret-sc
+anning/working-with-secret-sca
+nning-and-push-protection/work
+ing-with-push-protection-from-
+the-command-line#resolving-a-b
+locked-push        
+remote:             
+remote:             
+remote:       ΓÇöΓÇö Mapbox 
+Secret Access Token ΓÇöΓÇöΓÇöΓ
+ÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓ
+ÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓ
+Çö        
+remote:        locations:     
+   
+remote:          - commit: dcb
+1cb5cc1e29aa5012dfd9bde4e087d5
+153c7be        
+remote:            path: lib/s
+ervices/location_service.dart:
+145        
+remote:          - commit: 8fe
+f5b7be0f77bd1a130c4e27f1ff99dc
+fd38496        
+remote:            path: lib/s
+ervices/location_service.dart:
+171        
+remote:          - commit: 2e3
+f424d13fd250228360fdfb20f3d6ea
+e81e717        
+remote:            path: lib/s
+ervices/location_service.dart:
+175        
+remote:          - commit: 2e3
+f424d13fd250228360fdfb20f3d6ea
+e81e717        
+remote:            path: lib/s
+ervices/location_service.dart:
+265        
+remote:             
+remote:        (?) To push, 
+remove secret from commit(s) 
+or follow this URL to allow 
+the secret.        
+remote:        https://github.
+com/nyeeeerk/Capstone_DriveAwa
+re/security/secret-scanning/un
+block-secret/3AmdtzaqaXkzzLB0S
+2mYFQwDCxq        
+remote:             
+remote: 
+remote: 
+To https://github.com/nyeeeerk
+/Capstone_DriveAware.git
+ ! [remote rejected] 
+tflitemodel -> tflitemodel 
+(push declined due to 
+repository rule violations)
+error: failed to push some 
+refs to 'https://github.com/ny
+eeeerk/Capstone_DriveAware.git
+'
