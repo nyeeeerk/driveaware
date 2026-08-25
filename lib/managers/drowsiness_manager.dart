@@ -120,11 +120,11 @@ class DrowsinessManager {
 
     // Model score is logged but NOT used for escalation until tuned
 
-    if (result.isHeadDropped || result.isProlongedEyesClosed) {
+    if (result.isPitchCritical || result.isProlongedEyesClosed) {
       newStatus = DriverStatus.sleeping;
-    } else if (result.isMicrosleep) {
+    } else if (result.isMicrosleep || result.isPitchWarning) {
       newStatus = DriverStatus.critical;
-    } else if (result.isUnnaturalBlinks || result.isYawning) {
+    } else if (result.isYawDistracted || result.isRollSlumped || result.isFaceOccluded || result.isUnnaturalBlinks || result.isYawning || result.isHeadDropped) {
       newStatus = DriverStatus.warning;
     } else {
       newStatus = DriverStatus.normal;

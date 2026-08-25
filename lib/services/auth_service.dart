@@ -28,6 +28,9 @@ class AuthService {
       });
     }
 
+    // Ensure session is cleared so user must explicitly sign in after registration
+    await _client.auth.signOut();
+
     return response;
   }
 

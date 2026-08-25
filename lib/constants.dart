@@ -34,6 +34,22 @@ class AppConstants {
   static const double pitchUpAngleThreshold = 15.0;
   static const int headTiltDurationThreshold = 5000; // ms
 
+  // ANTI-GRAVITY / DROWSINESS DETECTION (PITCH AXIS)
+  static const double pitchWarningAngleThreshold = 25.0;  // degrees downward drop from baseline
+  static const int pitchWarningDurationMs = 1500;         // ms (> 1.5 seconds)
+  static const double pitchCriticalAngleThreshold = 40.0; // degrees downward drop from baseline
+  static const int bobbingWindowMs = 5000;                // ms (5.0 seconds window)
+  static const int bobbingCountThreshold = 2;             // repeated bobbing dip threshold in window
+
+  // HEAD POSITIONING & ALIGNMENT (YAW & ROLL AXES)
+  static const double yawDistractionAngleThreshold = 35.0; // degrees turned away from road center
+  static const int yawDistractionDurationMs = 2000;        // ms (> 2.0 consecutive seconds)
+  static const double rollSlumpAngleThreshold = 20.0;      // degrees tilted ear-to-shoulder sideways
+  static const int rollSlumpDurationMs = 1500;             // ms (> 1.5 consecutive seconds)
+
+  // OCCLUSION / LOSS OF TRACKING
+  static const int occlusionDurationThresholdMs = 1000;    // ms (> 1.0 second face undetectable)
+
   static const int yawnDurationWarningThreshold = 3000; // ms (must yawn for 3s+ to count)
   static const int yawningCountThreshold = 2; // (yawns within 10s window -> Warning)
 

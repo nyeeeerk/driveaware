@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:just_audio/just_audio.dart';
+import '../services/face_detector.dart';
 import '../services/location_service.dart';
 import '../services/ai_service.dart';
 import '../services/tts_stt_service.dart';
@@ -40,6 +41,8 @@ class MonitoringController extends ChangeNotifier {
   // Alarm player for sleeping alert
   final AudioPlayer _alarmPlayer = AudioPlayer();
 
+  DrowsinessResult? lastResult;
+
   MonitoringController({
     required this.calibration,
     required this.onRequireAlertPopup,
@@ -55,7 +58,10 @@ class MonitoringController extends ChangeNotifier {
     _drowsinessManager = DrowsinessManager(
       calibration: calibration,
       onStatusChanged: _handleStatusChange,
-      onResultUpdated: (result) {},
+      onResultUpdated: (result) {
+        lastResult = result;
+        notifyListeners();
+      },
       onNightModeChanged: _handleNightModeChange,
     );
     
@@ -122,7 +128,18 @@ class MonitoringController extends ChangeNotifier {
     isTalking = true;
     notifyListeners();
 
-    await _ttsService.speakUrgent("Warning, early signs of fatigue.");
+    String warningSpeech = "Warning, early signs of fatigue.";
+    if (lastResult?.isYawDistracted == true) {
+      warningSpeech = "Distraction warning. Please keep your eyes centered on the road.";
+    } else if (lastResult?.isRollSlumped == true) {
+      warningSpeech = "Posture warning. Please maintain an upright sitting posture.";
+    } else if (lastResult?.isFaceOccluded == true) {
+      warningSpeech = "Face tracking lost. Please ensure your face is visible to the camera.";
+    } else if (lastResult?.isPitchWarning == true) {
+      warningSpeech = "Head nodding detected. Please keep your head up.";
+    }
+
+    await _ttsService.speakUrgent(warningSpeech);
     if (sessionId != _alertSessionId) return;
 
     // Check connectivity before making API calls
@@ -169,7 +186,14 @@ class MonitoringController extends ChangeNotifier {
     isTalking = true;
     notifyListeners();
 
-    await _ttsService.speakUrgent("Fatigue detected.");
+    String criticalSpeech = "Fatigue detected.";
+    if (lastResult?.isHeadBobbing == true) {
+      criticalSpeech = "Repeated head nodding detected. Critical fatigue.";
+    } else if (lastResult?.isPitchCritical == true) {
+      criticalSpeech = "Critical head drop detected. Please pull over.";
+    }
+
+    await _ttsService.speakUrgent(criticalSpeech);
     if (sessionId != _alertSessionId) return;
 
     // Check connectivity before making API calls
@@ -226,7 +250,10 @@ class MonitoringController extends ChangeNotifier {
     final String? driverResponse = await _listenForResponse(const Duration(seconds: 8));
     if (sessionId != _alertSessionId) return;
 
-    if (driverResponse != null && driverResponse.isNotEmpty) {
+    final bool hasRealResponse = driverResponse != null
+        && driverResponse.trim().length >= 3
+        && RegExp(r'[a-zA-Z]').hasMatch(driverResponse);
+    if (hasRealResponse) {
       // Driver responded — have a conversation
       debugPrint('🗣️ Driver responded during sleeping alert: $driverResponse');
       message = "\"Processing...\"";
@@ -311,7 +338,7 @@ class MonitoringController extends ChangeNotifier {
         notifyListeners();
         // In a noisy car, finalResult might never fire before timeout.
         // If we heard anything, use it.
-        completer.complete(lastWords.isNotEmpty ? lastWords : null);
+        completer.complete(null); // Timeout with no final result = no response
       }
     });
 

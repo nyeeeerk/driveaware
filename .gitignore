@@ -1,6 +1,11 @@
 # Environment variables
 .env
 
+# Signing keys
+android/upload-keystore.jks
+android/key.properties
+*.jks
+
 # Miscellaneous
 *.class
 *.log

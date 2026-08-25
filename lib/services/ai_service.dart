@@ -46,40 +46,62 @@ class AIService {
   }
 
   Future<String> _makeApiCall(List<Map<String, dynamic>> messages, {required String fallback}) async {
-    try {
-      print('🌐 API CALL: Sending request to Trinity via OpenRouter...');
-      final response = await http.post(
-        Uri.parse(AppConstants.openRouterUrl),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer ${AppConstants.openRouterApiKey}",
-        },
-        body: jsonEncode({
-          "model": AppConstants.aiModel,
-          "messages": messages,
-          "max_tokens": 150,
-          "temperature": 0.7,
-        }),
-      ).timeout(const Duration(seconds: 30));
+    final apiKey = AppConstants.openRouterApiKey;
+    final apiUrl = AppConstants.openRouterUrl;
+    final primaryModel = AppConstants.aiModel;
 
-      print('🌐 API RESPONSE: Status ${response.statusCode}');
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        String? content = data['choices']?[0]?['message']?['content'];
-        if (content != null) {
-          String cleanResp = _cleanResponse(content);
-          print('🌐 AI SAID: $cleanResp');
-          _history.add({"role": "assistant", "content": cleanResp});
-          return cleanResp;
-        } else {
-          print('🌐 API ERROR: No content in response: ${response.body}');
+    // openrouter/free first — it auto-picks the fastest available free model
+    final List<String> candidateModels = [
+      'openrouter/free',
+      primaryModel,
+      'google/gemma-4-26b-a4b-it:free',
+      'inclusionai/ling-3.0-flash:free',
+    ];
+
+    final modelsToTry = candidateModels.toSet().toList();
+
+    for (final model in modelsToTry) {
+      try {
+        print('🌐 Trying $model...');
+        final response = await http.post(
+          Uri.parse(apiUrl),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $apiKey",
+            "HTTP-Referer": "https://github.com/driveaware",
+            "X-Title": "DriveAware",
+          },
+          body: jsonEncode({
+            "model": model,
+            "messages": messages,
+            "max_tokens": 150,
+            "temperature": 0.7,
+          }),
+        ).timeout(const Duration(seconds: 10));
+
+        // Skip instantly on non-retryable errors
+        if (response.statusCode == 404 || response.statusCode == 401) {
+          print('⏭️ $model → ${response.statusCode}, skipping');
+          continue;
         }
-      } else {
-        print('🌐 API ERROR: ${response.statusCode} - ${response.body}');
+
+        if (response.statusCode == 200 && response.body.isNotEmpty) {
+          final data = jsonDecode(response.body);
+          String? content = data['choices']?[0]?['message']?['content'];
+          if (content != null && content.trim().isNotEmpty) {
+            String cleanResp = _cleanResponse(content);
+            print('✅ AI ($model): $cleanResp');
+            _history.add({"role": "assistant", "content": cleanResp});
+            return cleanResp;
+          }
+        }
+        print('⚠️ $model → HTTP ${response.statusCode}, empty content');
+      } catch (e) {
+        print('💥 $model → $e');
       }
-    } catch (e) {
-      print("🌐 API EXCEPTION: $e");
     }
+
+    print('🚫 All models failed');
     return fallback;
   }
 
